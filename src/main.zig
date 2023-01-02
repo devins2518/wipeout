@@ -90,22 +90,22 @@ pub fn Collapser(comptime TilesTy: type, comptime height: usize, comptime width:
             {
                 const valid_neighbors = val.getValidNeighbors(.up);
                 if (idx >= width)
-                    self.entropy[idx - width] = valid_neighbors;
+                    self.entropy[idx - width].setIntersection(valid_neighbors);
             }
             {
                 const valid_neighbors = val.getValidNeighbors(.left);
                 if (idx % width != 0)
-                    self.entropy[idx - 1] = valid_neighbors;
+                    self.entropy[idx - 1].setIntersection(valid_neighbors);
             }
             {
                 const valid_neighbors = val.getValidNeighbors(.right);
                 if (idx % width != width - 1)
-                    self.entropy[idx + 1] = valid_neighbors;
+                    self.entropy[idx + 1].setIntersection(valid_neighbors);
             }
             {
                 const valid_neighbors = val.getValidNeighbors(.down);
                 if (idx + width < TilesLen)
-                    self.entropy[idx + width] = valid_neighbors;
+                    self.entropy[idx + width].setIntersection(valid_neighbors);
             }
         }
         fn collapseTile(self: *Self, idx: usize, val: TilesTy) void {
