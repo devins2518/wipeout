@@ -29,17 +29,20 @@ pub fn Collapser(comptime TilesTy: type, comptime height: usize, comptime width:
 
         pub fn collapse(self: *Self) [TilesLen]TilesTy {
             while (!self.collapsed.eql(CollapsedTyFull)) {
-                // Find tile with least entropy
-                const idx = self.findIdxOfLeastEntropyOrRandUncollapsedTile();
-                // Get value to assign to tile
-                const val = if (self.entropy[idx].count() == 1)
-                    @intToEnum(TilesTy, self.entropy[idx].findFirstSet().?)
-                else
-                    self.getRandTile(self.entropy[idx]);
-                // Assign to tile and update entropy
-                self.collapseTile(idx, val);
+                self.collapseNext();
             }
             return self.tiles;
+        }
+        pub fn collapseNext(self: *Self) void {
+            // Find tile with least entropy
+            const idx = self.findIdxOfLeastEntropyOrRandUncollapsedTile();
+            // Get value to assign to tile
+            const val = if (self.entropy[idx].count() == 1)
+                @intToEnum(TilesTy, self.entropy[idx].findFirstSet().?)
+            else
+                self.getRandTile(self.entropy[idx]);
+            // Assign to tile and update entropy
+            self.collapseTile(idx, val);
         }
         fn findIdxOfLeastEntropyOrRandUncollapsedTile(self: *Self) usize {
             // If this function is called on a collapsed set, something else has gone wrong.
