@@ -33,7 +33,7 @@ pub fn Collapser(comptime TilesTy: type, comptime height: usize, comptime width:
             }
             return self.tiles;
         }
-        pub fn collapseNext(self: *Self) void {
+        fn collapseNext(self: *Self) void {
             // Find tile with least entropy
             const idx = self.findIdxOfLeastEntropyOrRandUncollapsedTile();
             // Get value to assign to tile
