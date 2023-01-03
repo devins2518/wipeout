@@ -13,7 +13,12 @@ pub fn TileBitSetTy(comptime E: type) type {
     return std.bit_set.StaticBitSet(EInfo.Enum.fields.len);
 }
 
-pub fn Collapser(comptime TilesTy: type, comptime height: usize, comptime width: usize) type {
+pub fn Collapser(
+    comptime TilesTy: type,
+    comptime height: usize,
+    comptime width: usize,
+    comptime Callback: ?fn (collapser: anytype) void,
+) type {
     const TilesLen = height * width;
     return struct {
         const Self = @This();
@@ -30,6 +35,8 @@ pub fn Collapser(comptime TilesTy: type, comptime height: usize, comptime width:
         pub fn collapse(self: *Self) [TilesLen]TilesTy {
             while (!self.collapsed.eql(CollapsedTyFull)) {
                 self.collapseNext();
+                if (Callback) |C|
+                    C(self);
             }
             return self.tiles;
         }
@@ -140,7 +147,7 @@ const _TestTiles = enum(u8) {
 };
 
 test "idx of least entropy" {
-    const C = Collapser(_TestTiles, 2, 2);
+    const C = Collapser(_TestTiles, 2, 2, null);
     const full = C.TileSetTy.initFull();
     const empty = C.TileSetTy.initEmpty();
     var one = C.TileSetTy.initEmpty();
@@ -208,7 +215,7 @@ test "idx of least entropy" {
 }
 
 test "update entropy" {
-    const C = Collapser(_TestTiles, 2, 2);
+    const C = Collapser(_TestTiles, 2, 2, null);
     const empty = C.TileSetTy.initEmpty();
     const full = C.TileSetTy.initFull();
     const top_left = blk: {

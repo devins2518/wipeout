@@ -10,19 +10,62 @@ const TileSet = enum(u8) {
     left = 1,
     right = 2,
 
+    pub fn format(self: TileSet, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
+        const block = switch (self) {
+            .blank => "╋",
+            .left => "┫",
+            .right => "┣",
+        };
+        try std.fmt.format(writer, "{s}", .{block});
+    }
+
     pub fn getValidNeighbors(self: @This(), comptime direction: Wipeout.Direction) TileSetType {
-        var empty = TileSetType.initEmpty();
-        empty.set(@enumToInt(TileSet.blank));
-        if (self == .blank or (self == .left and direction == .right))
-            empty.set(@enumToInt(TileSet.right))
-        else if (self == .blank or (self == .right and direction == .left))
-            empty.set(@enumToInt(TileSet.left));
+        var empty = TileSetType.initFull();
+        if (self == .blank and direction == .left) {
+            empty.unset(@enumToInt(TileSet.left));
+        } else if (self == .blank and direction == .right) {
+            empty.unset(@enumToInt(TileSet.right));
+        } else if (self == .left and direction == .left) {
+            empty.unset(@enumToInt(TileSet.left));
+        } else if (self == .left and direction == .right) {
+            empty.unset(@enumToInt(TileSet.left));
+            empty.unset(@enumToInt(TileSet.blank));
+        } else if (self == .right and direction == .left) {
+            empty.unset(@enumToInt(TileSet.right));
+            empty.unset(@enumToInt(TileSet.blank));
+        } else if (self == .right and direction == .right) {
+            empty.unset(@enumToInt(TileSet.right));
+        }
         return empty;
     }
 };
 
 pub fn main() void {
-    var c = Collapser(TileSet, 2, 2){};
+    const h = 20;
+    const w = 50;
+    var c = Collapser(TileSet, h, w, null){};
     const tiles = c.collapse();
-    std.debug.print("{any}", .{tiles});
+    for ([_]void{undefined} ** h) |_, y| {
+        for ([_]void{undefined} ** w) |_, x| {
+            std.debug.print("{}", .{tiles[y * w + x]});
+        }
+        std.debug.print("\n", .{});
+    }
+}
+
+fn printTiles(collapser: anytype) void {
+    const h = 20;
+    const w = 50;
+    const collapsed = @field(collapser, "collapsed");
+    const tiles = @field(collapser, "tiles");
+    for ([_]void{undefined} ** h) |_, y| {
+        for ([_]void{undefined} ** w) |_, x| {
+            const idx = y * w + x;
+            if (collapsed.isSet(idx))
+                std.debug.print("{}", .{tiles[idx]})
+            else
+                std.debug.print(" ", .{});
+        }
+        std.debug.print("\n", .{});
+    }
 }
