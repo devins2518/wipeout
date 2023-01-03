@@ -126,36 +126,16 @@ const _TestTiles = enum(u8) {
     bottom_right = 4,
 
     fn getValidNeighbors(self: _TestTiles, comptime direction: Direction) _TestTilesSet {
-        const empty = _TestTilesSet.initEmpty();
-        var not_empty = _TestTilesSet.initEmpty();
-        switch (self) {
-            .blank => not_empty = _TestTilesSet.initFull(),
-            .top_left => if (direction == .right)
-                not_empty.set(@enumToInt(_TestTiles.top_right))
-            else if (direction == .down)
-                not_empty.set(@enumToInt(_TestTiles.bottom_left))
-            else
-                return empty,
-            .bottom_left => if (direction == .right)
-                not_empty.set(@enumToInt(_TestTiles.bottom_right))
-            else if (direction == .up)
-                not_empty.set(@enumToInt(_TestTiles.top_left))
-            else
-                return empty,
-            .top_right => if (direction == .left)
-                not_empty.set(@enumToInt(_TestTiles.top_left))
-            else if (direction == .down)
-                not_empty.set(@enumToInt(_TestTiles.bottom_right))
-            else
-                return empty,
-            .bottom_right => if (direction == .left)
-                not_empty.set(@enumToInt(_TestTiles.bottom_left))
-            else if (direction == .up)
-                not_empty.set(@enumToInt(_TestTiles.top_right))
-            else
-                return empty,
-        }
-        return not_empty;
+        var set = _TestTilesSet.initEmpty();
+        if ((self == .top_right and direction == .left) or (self == .bottom_left and direction == .up))
+            set.set(@enumToInt(_TestTiles.top_left))
+        else if ((self == .top_left and direction == .right) or (self == .bottom_right and direction == .up))
+            set.set(@enumToInt(_TestTiles.top_right))
+        else if ((self == .bottom_right and direction == .left) or (self == .top_left and direction == .down))
+            set.set(@enumToInt(_TestTiles.bottom_left))
+        else if ((self == .bottom_left and direction == .right) or (self == .top_right and direction == .down))
+            set.set(@enumToInt(_TestTiles.bottom_right));
+        return set;
     }
 };
 
