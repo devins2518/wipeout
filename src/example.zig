@@ -9,20 +9,24 @@ const TileSet = enum(u8) {
     blank = 0,
     left = 1,
     right = 2,
-    top_left = 3,
-    top_right = 4,
-    bottom_left = 5,
-    bottom_right = 6,
+    top_corner_left = 3,
+    top_corner_right = 4,
+    bottom_corner_left = 5,
+    bottom_corner_right = 6,
+    top_t = 7,
+    bottom_t = 8,
 
     pub fn format(self: TileSet, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
         const block = switch (self) {
             .blank => "╋",
             .left => "┫",
             .right => "┣",
-            .top_left => "┓",
-            .top_right => "┏",
-            .bottom_left => "┛",
-            .bottom_right => "┗",
+            .top_corner_left => "┓",
+            .top_corner_right => "┏",
+            .bottom_corner_left => "┛",
+            .bottom_corner_right => "┗",
+            .top_t => "┳",
+            .bottom_t => "┻",
         };
         try std.fmt.format(writer, "{s}", .{block});
     }
@@ -66,7 +70,7 @@ const TileSet = enum(u8) {
                     // Down
                     [_]u1{ 0, 1, 0 },
                 },
-                // Top left
+                // Top corner left
                 [4][3]u1{
                     // Up
                     [_]u1{ 0, 0, 0 },
@@ -77,7 +81,7 @@ const TileSet = enum(u8) {
                     // Down
                     [_]u1{ 0, 1, 0 },
                 },
-                // Top right
+                // Top corner right
                 [4][3]u1{
                     // Up
                     [_]u1{ 0, 0, 0 },
@@ -88,7 +92,7 @@ const TileSet = enum(u8) {
                     // Down
                     [_]u1{ 0, 1, 0 },
                 },
-                // Bottom left
+                // Bottom corner left
                 [4][3]u1{
                     // Up
                     [_]u1{ 0, 1, 0 },
@@ -99,12 +103,34 @@ const TileSet = enum(u8) {
                     // Down
                     [_]u1{ 0, 0, 0 },
                 },
-                // Bottom right
+                // Bottom corner right
                 [4][3]u1{
                     // Up
                     [_]u1{ 0, 1, 0 },
                     // Left
                     [_]u1{ 0, 0, 0 },
+                    // Right
+                    [_]u1{ 0, 1, 0 },
+                    // Down
+                    [_]u1{ 0, 0, 0 },
+                },
+                // Top T
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 0, 0 },
+                    // Left
+                    [_]u1{ 0, 1, 0 },
+                    // Right
+                    [_]u1{ 0, 1, 0 },
+                    // Down
+                    [_]u1{ 0, 1, 0 },
+                },
+                // Bottom T
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 1, 0 },
+                    // Left
+                    [_]u1{ 0, 1, 0 },
                     // Right
                     [_]u1{ 0, 1, 0 },
                     // Down
