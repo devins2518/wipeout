@@ -9,12 +9,20 @@ const TileSet = enum(u8) {
     blank = 0,
     left = 1,
     right = 2,
+    top_left = 3,
+    top_right = 4,
+    bottom_left = 5,
+    bottom_right = 6,
 
     pub fn format(self: TileSet, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
         const block = switch (self) {
             .blank => "╋",
             .left => "┫",
             .right => "┣",
+            .top_left => "┓",
+            .top_right => "┏",
+            .bottom_left => "┛",
+            .bottom_right => "┗",
         };
         try std.fmt.format(writer, "{s}", .{block});
     }
@@ -24,7 +32,7 @@ const TileSet = enum(u8) {
             const TileSetInfo = @typeInfo(@This()).Enum;
             const DirectionInfo = @typeInfo(Direction).Enum;
             var valid: [TileSetInfo.fields.len][DirectionInfo.fields.len]TileSetType = undefined;
-            const edges = [_][4][3]u1{
+            const edges = [TileSetInfo.fields.len][4][3]u1{
                 // Blank
                 [4][3]u1{
                     // Up
@@ -58,6 +66,50 @@ const TileSet = enum(u8) {
                     // Down
                     [_]u1{ 0, 1, 0 },
                 },
+                // Top left
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 0, 0 },
+                    // Left
+                    [_]u1{ 0, 1, 0 },
+                    // Right
+                    [_]u1{ 0, 0, 0 },
+                    // Down
+                    [_]u1{ 0, 1, 0 },
+                },
+                // Top right
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 0, 0 },
+                    // Left
+                    [_]u1{ 0, 0, 0 },
+                    // Right
+                    [_]u1{ 0, 1, 0 },
+                    // Down
+                    [_]u1{ 0, 1, 0 },
+                },
+                // Bottom left
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 1, 0 },
+                    // Left
+                    [_]u1{ 0, 1, 0 },
+                    // Right
+                    [_]u1{ 0, 0, 0 },
+                    // Down
+                    [_]u1{ 0, 0, 0 },
+                },
+                // Bottom right
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 1, 0 },
+                    // Left
+                    [_]u1{ 0, 0, 0 },
+                    // Right
+                    [_]u1{ 0, 1, 0 },
+                    // Down
+                    [_]u1{ 0, 0, 0 },
+                },
             };
             for (std.enums.values(@This())) |_, e| {
                 for ([_]Direction{ .up, .left, .right, .down }) |d| {
@@ -68,9 +120,13 @@ const TileSet = enum(u8) {
                         .right => .left,
                         .down => .up,
                     };
-                    for (edges) |other, i| {
-                        const other_edge = other[@enumToInt(other_d)];
-                        if (std.mem.eql(u1, &edges[e][@enumToInt(d)], &other_edge)) {
+                    const e_edge = &edges[e][@enumToInt(d)];
+                    for (edges) |_, i| {
+                        const other_edge = &edges[i][@enumToInt(other_d)];
+                        if (e_edge[0] == other_edge[0] and
+                            e_edge[1] == other_edge[1] and
+                            e_edge[2] == other_edge[2])
+                        {
                             valid_for_e_d.set(i);
                         }
                     }
