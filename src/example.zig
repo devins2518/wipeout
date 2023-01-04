@@ -20,23 +20,66 @@ const TileSet = enum(u8) {
     }
 
     pub fn getValidNeighbors(self: @This(), comptime direction: Wipeout.Direction) TileSetType {
-        var empty = TileSetType.initFull();
-        if (self == .blank and direction == .left) {
-            empty.unset(@enumToInt(TileSet.left));
-        } else if (self == .blank and direction == .right) {
-            empty.unset(@enumToInt(TileSet.right));
-        } else if (self == .left and direction == .left) {
-            empty.unset(@enumToInt(TileSet.left));
-        } else if (self == .left and direction == .right) {
-            empty.unset(@enumToInt(TileSet.left));
-            empty.unset(@enumToInt(TileSet.blank));
-        } else if (self == .right and direction == .left) {
-            empty.unset(@enumToInt(TileSet.right));
-            empty.unset(@enumToInt(TileSet.blank));
-        } else if (self == .right and direction == .right) {
-            empty.unset(@enumToInt(TileSet.right));
-        }
-        return empty;
+        const valid = comptime blk: {
+            const TileSetInfo = @typeInfo(@This()).Enum;
+            const DirectionInfo = @typeInfo(Direction).Enum;
+            var valid: [TileSetInfo.fields.len][DirectionInfo.fields.len]TileSetType = undefined;
+            const edges = [_][4][3]u1{
+                // Blank
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 1, 0 },
+                    // Left
+                    [_]u1{ 0, 1, 0 },
+                    // Right
+                    [_]u1{ 0, 1, 0 },
+                    // Down
+                    [_]u1{ 0, 1, 0 },
+                },
+                // Left
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 1, 0 },
+                    // Left
+                    [_]u1{ 0, 1, 0 },
+                    // Right
+                    [_]u1{ 0, 0, 0 },
+                    // Down
+                    [_]u1{ 0, 1, 0 },
+                },
+                // Right
+                [4][3]u1{
+                    // Up
+                    [_]u1{ 0, 1, 0 },
+                    // Left
+                    [_]u1{ 0, 0, 0 },
+                    // Right
+                    [_]u1{ 0, 1, 0 },
+                    // Down
+                    [_]u1{ 0, 1, 0 },
+                },
+            };
+            for (std.enums.values(@This())) |_, e| {
+                for ([_]Direction{ .up, .left, .right, .down }) |d| {
+                    var valid_for_e_d = TileSetType.initEmpty();
+                    const other_d: Direction = switch (d) {
+                        .up => .down,
+                        .left => .right,
+                        .right => .left,
+                        .down => .up,
+                    };
+                    for (edges) |other, i| {
+                        const other_edge = other[@enumToInt(other_d)];
+                        if (std.mem.eql(u1, &edges[e][@enumToInt(d)], &other_edge)) {
+                            valid_for_e_d.set(i);
+                        }
+                    }
+                    valid[e][@enumToInt(d)] = valid_for_e_d;
+                }
+            }
+            break :blk valid;
+        };
+        return valid[@enumToInt(self)][@enumToInt(direction)];
     }
 };
 
