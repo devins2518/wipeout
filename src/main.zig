@@ -32,6 +32,10 @@ pub fn Collapser(
         // Is this ok?
         rand: std.rand.DefaultPrng = std.rand.DefaultPrng.init(0),
 
+        pub fn init() Self {
+            return Self{ .rand = std.rand.DefaultPrng.init(@bitCast(u64, std.time.timestamp())) };
+        }
+
         pub fn collapse(self: *Self) [TilesLen]TilesTy {
             while (!self.collapsed.eql(CollapsedTyFull)) {
                 self.collapseNext();

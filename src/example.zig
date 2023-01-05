@@ -4,6 +4,8 @@ const Collapser = Wipeout.Collapser;
 const Direction = Wipeout.Direction;
 const TileSetTy = Wipeout.TileBitSetTy;
 
+pub const log_level = .err;
+
 const TileSet = enum(u8) {
     const TileSetType = TileSetTy(@This());
     blank = 0,
@@ -168,7 +170,7 @@ const TileSet = enum(u8) {
 pub fn main() void {
     const h = 20;
     const w = 50;
-    var c = Collapser(TileSet, h, w, null){};
+    var c = Collapser(TileSet, h, w, null).init();
     const tiles = c.collapse();
     for ([_]void{undefined} ** h) |_, y| {
         for ([_]void{undefined} ** w) |_, x| {
