@@ -38,106 +38,81 @@ const TileSet = enum(u8) {
             const TileSetInfo = @typeInfo(@This()).Enum;
             const DirectionInfo = @typeInfo(Direction).Enum;
             var valid: [TileSetInfo.fields.len][DirectionInfo.fields.len]TileSetType = undefined;
-            const edges = [TileSetInfo.fields.len][4][3]u1{
-                // Blank
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 1, 0 },
-                    // Left
-                    [_]u1{ 0, 1, 0 },
-                    // Right
-                    [_]u1{ 0, 1, 0 },
-                    // Down
-                    [_]u1{ 0, 1, 0 },
-                },
-                // Left
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 1, 0 },
-                    // Left
-                    [_]u1{ 0, 1, 0 },
-                    // Right
-                    [_]u1{ 0, 0, 0 },
-                    // Down
-                    [_]u1{ 0, 1, 0 },
-                },
-                // Right
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 1, 0 },
-                    // Left
-                    [_]u1{ 0, 0, 0 },
-                    // Right
-                    [_]u1{ 0, 1, 0 },
-                    // Down
-                    [_]u1{ 0, 1, 0 },
-                },
-                // Top corner left
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 0, 0 },
-                    // Left
-                    [_]u1{ 0, 1, 0 },
-                    // Right
-                    [_]u1{ 0, 0, 0 },
-                    // Down
-                    [_]u1{ 0, 1, 0 },
-                },
-                // Top corner right
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 0, 0 },
-                    // Left
-                    [_]u1{ 0, 0, 0 },
-                    // Right
-                    [_]u1{ 0, 1, 0 },
-                    // Down
-                    [_]u1{ 0, 1, 0 },
-                },
-                // Bottom corner left
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 1, 0 },
-                    // Left
-                    [_]u1{ 0, 1, 0 },
-                    // Right
-                    [_]u1{ 0, 0, 0 },
-                    // Down
-                    [_]u1{ 0, 0, 0 },
-                },
-                // Bottom corner right
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 1, 0 },
-                    // Left
-                    [_]u1{ 0, 0, 0 },
-                    // Right
-                    [_]u1{ 0, 1, 0 },
-                    // Down
-                    [_]u1{ 0, 0, 0 },
-                },
-                // Top T
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 0, 0 },
-                    // Left
-                    [_]u1{ 0, 1, 0 },
-                    // Right
-                    [_]u1{ 0, 1, 0 },
-                    // Down
-                    [_]u1{ 0, 1, 0 },
-                },
-                // Bottom T
-                [4][3]u1{
-                    // Up
-                    [_]u1{ 0, 1, 0 },
-                    // Left
-                    [_]u1{ 0, 1, 0 },
-                    // Right
-                    [_]u1{ 0, 1, 0 },
-                    // Down
-                    [_]u1{ 0, 0, 0 },
-                },
+            const edges: [TileSetInfo.fields.len][4][3]u1 = edges: {
+                var edges: [TileSetInfo.fields.len][4][3]u1 = undefined;
+                edges[@enumToInt(TileSet.blank)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 1, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.left)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 1, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.right)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 1, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.top_corner_left)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 1, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.top_corner_right)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 1, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.bottom_corner_left)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 0, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.bottom_corner_right)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 0, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.top_t)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 0, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 1, 0 };
+                    break :edge edge;
+                };
+                edges[@enumToInt(TileSet.bottom_t)] = edge: {
+                    var edge: [4][3]u1 = undefined;
+                    edge[@enumToInt(Direction.up)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.left)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.right)] = [_]u1{ 0, 1, 0 };
+                    edge[@enumToInt(Direction.down)] = [_]u1{ 0, 0, 0 };
+                    break :edge edge;
+                };
+                break :edges edges;
             };
             for (std.enums.values(@This())) |_, e| {
                 for ([_]Direction{ .up, .left, .right, .down }) |d| {

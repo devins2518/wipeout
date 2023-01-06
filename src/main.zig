@@ -97,26 +97,30 @@ pub fn Collapser(
             }
         }
         fn updateEntropy(self: *Self, idx: usize, val: TilesTy) void {
+            const conditions = blk: {
+                var conditions = [_]bool{undefined} ** 4;
+                conditions[@enumToInt(Direction.up)] = idx >= width;
+                conditions[@enumToInt(Direction.left)] = idx % width != 0;
+                conditions[@enumToInt(Direction.right)] = idx % width != width - 1;
+                conditions[@enumToInt(Direction.down)] = idx + width < TilesLen;
+                break :blk conditions;
+            };
+            const indexes = comptime blk: {
+                var indexes = [_]usize{undefined} ** 4;
+                indexes[@enumToInt(Direction.up)] = @bitCast(usize, -@intCast(isize, width));
+                indexes[@enumToInt(Direction.left)] = @bitCast(usize, @as(isize, -1));
+                indexes[@enumToInt(Direction.right)] = 1;
+                indexes[@enumToInt(Direction.down)] = width;
+                break :blk indexes;
+            };
+
             self.entropy[idx] = TileSetTy.initEmpty();
-            {
-                const valid_neighbors = val.getValidNeighbors(.up);
-                if (idx >= width)
-                    self.entropy[idx - width].setIntersection(valid_neighbors);
-            }
-            {
-                const valid_neighbors = val.getValidNeighbors(.left);
-                if (idx % width != 0)
-                    self.entropy[idx - 1].setIntersection(valid_neighbors);
-            }
-            {
-                const valid_neighbors = val.getValidNeighbors(.right);
-                if (idx % width != width - 1)
-                    self.entropy[idx + 1].setIntersection(valid_neighbors);
-            }
-            {
-                const valid_neighbors = val.getValidNeighbors(.down);
-                if (idx + width < TilesLen)
-                    self.entropy[idx + width].setIntersection(valid_neighbors);
+            inline for ([_]Direction{ .up, .left, .right, .down }) |direction| {
+                if (conditions[@enumToInt(direction)]) {
+                    const valid_neighbors = val.getValidNeighbors(direction);
+                    const offset_idx = idx +% indexes[@enumToInt(direction)];
+                    self.entropy[offset_idx].setIntersection(valid_neighbors);
+                }
             }
         }
         fn collapseTile(self: *Self, idx: usize, val: TilesTy) void {
